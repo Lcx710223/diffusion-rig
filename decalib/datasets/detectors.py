@@ -1,17 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Max-Planck-Gesellschaft zur Förderung der Wissenschaften e.V. (MPG) is
-# holder of all proprietary rights on this computer program.
-# Using this computer program means that you agree to the terms 
-# in the LICENSE file included with this software distribution. 
-# Any use not explicitly granted by the LICENSE is prohibited.
-#
-# Copyright©2019 Max-Planck-Gesellschaft zur Förderung
-# der Wissenschaften e.V. (MPG). acting on behalf of its Max Planck Institute
-# for Intelligent Systems. All rights reserved.
-#
-# For comments or questions, please email us at deca@tue.mpg.de
-# For commercial licensing contact, please contact ps-license@tuebingen.mpg.de
+###LCX250928,第10行。
 
 import numpy as np
 import torch
@@ -20,7 +7,7 @@ class FAN(object):
     def __init__(self):
         import face_alignment
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D,flip_input=False,device=device)
+        self.model = face_alignment.FaceAlignment( face_alignment.LandmarksType.TWO_D, flip_input=False, device=device )
 
     def run(self, image):
         '''
@@ -56,6 +43,3 @@ class MTCNN(object):
         else:
             bbox = out[0][0].squeeze()
             return bbox, 'bbox'
-
-
-
