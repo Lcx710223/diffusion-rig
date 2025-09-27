@@ -1,3 +1,4 @@
+###LCX250928,112行。新版的PILLOW移除了IMAGE.ANTIALIAS，替换为IMAGE.RESAMPLING.LANCZOS
 import bz2
 import os
 import os.path as osp
@@ -9,6 +10,7 @@ import requests
 import scipy.ndimage
 from tqdm import tqdm
 from argparse import ArgumentParser
+from PIL import Image
 
 LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
 
@@ -109,7 +111,9 @@ def image_align(src_file,
     img = img.transform((transform_size, transform_size), PIL.Image.QUAD,
                         (quad + 0.5).flatten(), PIL.Image.BILINEAR)
     if output_size < transform_size:
-        img = img.resize((output_size, output_size), PIL.Image.ANTIALIAS)
+        ### LCX250928 img = img.resize((output_size, output_size), PIL.Image.ANTIALIAS)
+        img = img.resize((output_size, output_size), Image.Resampling.LANCZOS)
+
 
     # Save aligned image.
     img.save(dst_file, 'PNG')
