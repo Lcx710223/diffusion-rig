@@ -1,3 +1,4 @@
+###LCX250928,COPILOT修改。
 import os, sys
 from tqdm import tqdm
 import torch as th
@@ -14,6 +15,7 @@ from PIL import Image
 from io import BytesIO
 import pickle
 import argparse
+import torch
 from utils.script_util import (
     add_dict_to_argparser,
 )
@@ -21,12 +23,15 @@ from utils.script_util import (
 
 def main():
     args = create_argparser().parse_args()
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Build DECA
     deca_cfg.model.use_tex = True
     deca_cfg.model.tex_path = "data/FLAME_texture.npz"
     deca_cfg.model.tex_type = "FLAME"
-    deca = DECA(config=deca_cfg, device="cuda")
+    ### LCX,CP,强调兼容性。 deca = DECA(config=deca_cfg, device="cuda")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    deca = DECA(config=deca_cfg, device=device)
 
     # Create Dataset
     dataset_root = args.data_dir
@@ -42,7 +47,7 @@ def main():
     if args.use_meanshape:
         shapes = []
         for td in testdata:
-            img = td["image"].to("cuda").unsqueeze(0)
+            img = td["image"].to(device).unsqueeze(0)
             code = deca.encode(img)
             shapes.append(code["shape"].detach())
         mean_shape = th.mean(th.cat(shapes, dim=0), dim=0, keepdim=True)
@@ -56,11 +61,11 @@ def main():
         for batch_id, data in enumerate(tqdm(loader)):
 
             with th.no_grad():
-                inp = data["image"].to("cuda")
+                inp = data["image"].to(device)
                 codedict = deca.encode(inp)
                 tform = data["tform"]
-                tform = th.inverse(tform).transpose(1, 2).to("cuda")
-                original_image = data["original_image"].to("cuda")
+                tform = th.inverse(tform).transpose(1, 2).to(device)
+                original_image = data["original_image"].to(device)
 
                 if args.use_meanshape:
                     codedict["shape"] = mean_shape.repeat(inp.shape[0], 1)
