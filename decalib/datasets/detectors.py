@@ -19,7 +19,8 @@ import torch
 class FAN(object):
     def __init__(self):
         import face_alignment
-        self.model = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, flip_input=False)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D,flip_input=False,device=device)
 
     def run(self, image):
         '''
