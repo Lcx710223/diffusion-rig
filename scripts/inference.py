@@ -1,5 +1,3 @@
-###LCX250928修改第40、75行。
-
 import argparse
 import os
 import sys
@@ -76,7 +74,12 @@ def create_inter_data(dataset, modes, meanshape_path=""):
             for k in code1:
                 ###LCX250928
                 import torch
-                code[k] = torch.from_numpy(code1[k]).clone()
+                import numpy as np
+
+                if isinstance(code1[k], np.ndarray):
+                    code[k] = torch.from_numpy(code1[k]).clone()
+                else:
+                    code[k] = code1[k].clone()
 
 
             origin_rendered = None
