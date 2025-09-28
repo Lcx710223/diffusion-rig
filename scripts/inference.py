@@ -25,7 +25,7 @@ import pickle
 
 
 def create_inter_data(dataset, modes, meanshape_path=""):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = th.device("cuda" if th.cuda.is_available() else "cpu")
     # Build DECA
     deca_cfg.model.use_tex = True
     deca_cfg.model.tex_path = "data/FLAME_texture.npz"
@@ -40,6 +40,8 @@ def create_inter_data(dataset, modes, meanshape_path=""):
             ###LCX250928
             import numpy as np
             meanshape = np.load(f)
+            meanshape = th.tensor(meanshape, dtype=torch.float32).unsqueeze(0).to(device)
+
 
     else:
         print("not use meanshape")
