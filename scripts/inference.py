@@ -36,15 +36,18 @@ def create_inter_data(dataset, modes, meanshape_path=""):
     meanshape = None
     if os.path.exists(meanshape_path):
         print("use meanshape: ", meanshape_path)
+        import numpy as np
         with open(meanshape_path, "rb") as f:
-            ###LCX250928
-            import numpy as np
+            ###LCX250928            
             meanshape = np.load(f)
-            meanshape = th.tensor(meanshape, dtype=torch.float32).unsqueeze(0).to(device)
-
-
+            # 如果是 1D 向量，则 reshape 为 [1, latent_dim]
+        # meanshape 应该是 [1, 100]，与 DECA 默认 shape_dim 一致
+        if meanshape.ndim == 1:
+            meanshape = meanshape.reshape(1, -1)
+        meanshape = th.tensor(meanshape, dtype=th.float32).to(device)
+        
     else:
-        print("not use meanshape")
+      print("not use meanshape")
 
     img2 = dataset[-1]["image"].unsqueeze(0).to("cuda")
     with th.no_grad():
@@ -68,7 +71,9 @@ def create_inter_data(dataset, modes, meanshape_path=""):
 
         code1["tform"] = tform
         if meanshape is not None:
-            code1["shape"] = meanshape
+            ###250928
+            if "shape" not in code1 or code1["shape"].shape[1] != meanshape.shape[1]:
+              code1["shape"] = meanshape
 
         for mode in modes:
 
