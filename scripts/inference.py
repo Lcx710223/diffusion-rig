@@ -25,7 +25,7 @@ import pickle
 
 
 def create_inter_data(dataset, modes, meanshape_path=""):
-
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Build DECA
     deca_cfg.model.use_tex = True
     deca_cfg.model.tex_path = "data/FLAME_texture.npz"
