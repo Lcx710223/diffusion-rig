@@ -1,3 +1,5 @@
+###LCX250928修改第40、75行。
+
 import argparse
 import os
 import sys
@@ -37,7 +39,10 @@ def create_inter_data(dataset, modes, meanshape_path=""):
     if os.path.exists(meanshape_path):
         print("use meanshape: ", meanshape_path)
         with open(meanshape_path, "rb") as f:
-            meanshape = pickle.load(f)
+            ###LCX250928
+            import numpy as np
+            meanshape = np.load(f)
+
     else:
         print("not use meanshape")
 
@@ -69,7 +74,10 @@ def create_inter_data(dataset, modes, meanshape_path=""):
 
             code = {}
             for k in code1:
-                code[k] = code1[k].clone()
+                ###LCX250928
+                import torch
+                code[k] = torch.from_numpy(code1[k]).clone()
+
 
             origin_rendered = None
 
