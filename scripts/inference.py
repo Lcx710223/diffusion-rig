@@ -77,9 +77,9 @@ def create_inter_data(dataset, modes, meanshape_path=""):
                 import numpy as np
 
                 if isinstance(code1[k], np.ndarray):
-                    code[k] = torch.from_numpy(code1[k]).clone()
+                  code[k] = torch.from_numpy(code1[k]).to(device).clone()
                 else:
-                    code[k] = code1[k].clone()
+                  code[k] = code1[k].to(device).clone()
 
 
             origin_rendered = None
