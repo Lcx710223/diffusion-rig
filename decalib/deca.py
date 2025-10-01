@@ -1,4 +1,5 @@
 ###LCX250928,COPILOT修改，76行。
+###LCX251002,CP修海DECA的INIT函数，使兼容CPU/GPU。
 
 import os, sys
 import torch
@@ -23,13 +24,14 @@ from .utils.config import cfg
 torch.backends.cudnn.benchmark = True
 
 class DECA(nn.Module):
-    def __init__(self, config=None, device='cuda'):
+    def __init__(self, config=None, device=None ):
         super(DECA, self).__init__()
         if config is None:
             self.cfg = cfg
         else:
             self.cfg = config
-        self.device = device
+        ###LCX251002兼容CPU/GPU。
+        self.device = device if device is not None else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.image_size = self.cfg.dataset.image_size
         self.uv_size = self.cfg.model.uv_size
 
