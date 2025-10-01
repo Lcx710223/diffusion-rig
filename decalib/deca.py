@@ -1,5 +1,5 @@
 ###LCX250928,COPILOT修改，76行。
-###LCX251002,CP修海DECA的INIT函数，使兼容CPU/GPU。
+###LCX251002,CP修改DECA的初始化函数，使兼容CPU/GPU。
 
 import os, sys
 import torch
