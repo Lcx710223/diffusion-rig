@@ -1,4 +1,4 @@
-###LCX250928,COPILOT修改。
+###LCX250928,COPILOT修改。LCX251007修改BATCH-SIZE=1。
 import os, sys
 from tqdm import tqdm
 import torch as th
@@ -38,6 +38,8 @@ def main():
     testdata = datasets.TestData(
         dataset_root, iscrop=True, size=args.image_size, sort=True
     )
+    # 插入调试语句，打印加载图像数量
+    print(f"LCX: TestData 加载图像数量: {len(testdata)}")
     batch_size = args.batch_size
     loader = DataLoader(testdata, batch_size=batch_size)
 
@@ -59,7 +61,8 @@ def main():
 
         total = 0
         for batch_id, data in enumerate(tqdm(loader)):
-
+            print(f"LCX:写入帧编号: {batch_id}")  #LCX: 插入这里
+            
             with th.no_grad():
                 inp = data["image"].to(device)
                 codedict = deca.encode(inp)
@@ -119,14 +122,14 @@ def main():
                     total += 1
         with env.begin(write=True) as transaction:
             transaction.put("length".encode("utf-8"), str(total).encode("utf-8"))
-
+        print(f"LCX : 最终写入帧数: {total}") ###LCX
 
 def create_argparser():
     defaults = dict(
         data_dir="",
         output_dir="",
         image_size=256,
-        batch_size=8,
+        batch_size=1, ###LCX251007。
         use_meanshape=False,
     )
     parser = argparse.ArgumentParser()
