@@ -1,3 +1,4 @@
+###LCX251009修改CPU/GPU兼容性及POSE取值。
 import argparse
 import os
 import sys
@@ -22,6 +23,7 @@ from decalib.utils.config import cfg as deca_cfg
 from decalib.datasets import datasets as deca_dataset
 
 import pickle
+device = th.device("cuda" if th.cuda.is_available() else "cpu")
 
 
 def create_inter_data(dataset, modes, meanshape_path=""):
@@ -49,14 +51,15 @@ def create_inter_data(dataset, modes, meanshape_path=""):
     else:
       print("not use meanshape")
 
-    img2 = dataset[-1]["image"].unsqueeze(0).to("cuda")
+    img2 = dataset[-1]["image"].unsqueeze(0).to(device)
     with th.no_grad():
         code2 = deca.encode(img2)
-    image2 = dataset[-1]["original_image"].unsqueeze(0).to("cuda")
+        print("LCX CODE2 POSE:", code2["pose"].cpu().numpy()) ###LCX251009检查POSE的6维值。
+    image2 = dataset[-1]["original_image"].unsqueeze(0).to(device)
 
     for i in range(len(dataset) - 1):
 
-        img1 = dataset[i]["image"].unsqueeze(0).to("cuda")
+        img1 = dataset[i]["image"].unsqueeze(0).to(device)
 
         with th.no_grad():
             code1 = deca.encode(img1)
@@ -66,8 +69,8 @@ def create_inter_data(dataset, modes, meanshape_path=""):
         ffhq_center = deca.decode(code1, return_ffhq_center=True)
 
         tform = dataset[i]["tform"].unsqueeze(0)
-        tform = th.inverse(tform).transpose(1, 2).to("cuda")
-        original_image = dataset[i]["original_image"].unsqueeze(0).to("cuda")
+        tform = th.inverse(tform).transpose(1, 2).to(device)
+        original_image = dataset[i]["original_image"].unsqueeze(0).to(device)
 
         code1["tform"] = tform
         if meanshape is not None:
@@ -130,11 +133,11 @@ def main():
     model, diffusion = create_model_and_diffusion(
         **args_to_dict(args, model_and_diffusion_defaults().keys())
     )
-
-    ckpt = th.load(args.model_path)
+    ####------LCX251009-----CPU/GPU兼容---------########
+    ckpt = th.load(args.model_path, map_location=device)
 
     model.load_state_dict(ckpt)
-    model.to("cuda")
+    model.to(device)
     model.eval()
 
     imagepath_list = []
@@ -165,7 +168,7 @@ def main():
 
     os.system("mkdir -p " + args.output_dir)
 
-    noise = th.randn(1, 3, args.image_size, args.image_size).to("cuda")
+    noise = th.randn(1, 3, args.image_size, args.image_size).to(device)
 
     vis_dir = args.output_dir
 
